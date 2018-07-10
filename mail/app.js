@@ -8,7 +8,10 @@ const cors = require("cors");
 const session = require("express-session");
 const MongoClient = require('mongodb').MongoClient
 const url = 'mongodb://localhost:27017';
+
 let DB;
+
+
 MongoClient.connect(url, function(err, client) {
 
     console.log(err)
@@ -33,7 +36,7 @@ app.use(session({
 
 
 
-// var sess;
+var sess;
 // app.get('/', function(req, res) {
 //     sess = req.session;
 
@@ -75,17 +78,20 @@ app.post("/login", function(req, res) {
 
     let detail = req.body;
 
+    
     var query = { email: detail.email, password: detail.password, flag: "true" };
     DB.collection("user").find(query).toArray(function(err, result) {
         if (err) throw err;
 
         if (result.length) {
-          
-            req.session.email=detail.email;
+       
+            sess= detail.email;
+            req.session.email= detail.email;
             req.session.save();
-            res.json(detail.email);
             console.log("logging you in");
+            console.log(req.session.email);
 
+            res.json(req.session.email);
 
         } 
         else
@@ -96,22 +102,35 @@ app.post("/login", function(req, res) {
 
 })
 
-app.get("/data",function(req,res){
+app.post("/data",function(req,res){
 
+    if(sess){
+
+        
     res.json({
         status:true, 
-        email:req.session.email,
+        email:sess
+      })
+    }
+    else{
+        res.json({
+            status:false
+        })
+        return
+    }
 
-});
 })
 
 app.post("/isloggedin",function(req,res){
     res.json({
-        status:!!req.session.email
+        status:!!sess
     })
 })
 
-app.post("/dashboard", function(req, res) {
+app.post("/logout", function(req, res) {
+
+    
+    console.log(sess);
 
     req.session.destroy(function(err) {
         if (err) {
