@@ -419,9 +419,6 @@ app.post('/graph', function(req, res) {
     DB.collection("starrate").find(query).toArray(function(err, result) {
         if (err) console.log(err);
 
-console.log(";;;;;;;;;;;;;;;;");
-        console.log(result);
-        console.log(";;;;;;;;;;;;;;;;");
         res.json(result);
 
     });
