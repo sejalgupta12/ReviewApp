@@ -10,7 +10,7 @@ const MongoClient = require('mongodb').MongoClient
 const url = 'mongodb://localhost:27017';
 
 let DB;
-
+const port = process.env.PORT || 8080;
 
 MongoClient.connect(url, function(err, client) {
 
@@ -37,9 +37,6 @@ app.use(session({
     resave:false,
 }));
 
-
-
-var sess;
 
 app.post("/register", function(req, res) {
     let task = req.body;
@@ -83,28 +80,24 @@ app.post("/checkForRegister", function(req, res) {
 
 })
 
-
-
-
+var sess;
 
 app.post("/login", function(req, res) {
 
     let detail = req.body;
-    console.log(detail.email);
-    console.log(detail.password);
-
+    
     var query = { "email": detail.email, "pass": detail.password, "flag": "true" };
 
     DB.collection("user").find(query).toArray(function(err, result) {
         if (err) throw err;
 
-        console.log(result);
+    
        if (result.length) {
        
-       
-            sess= detail.email;
-            res.json(sess);
-
+             sess=req.session;
+            sess.email= detail.email;
+            res.json(sess.email);
+           
         } 
         else
            res.json("Invalid User");
@@ -114,14 +107,16 @@ app.post("/login", function(req, res) {
 
 })
 
+
+
 app.post("/data",function(req,res){
 
-    if(sess){
+    if(sess.email){
 
         
     res.json([{
       
-        email:sess
+        email:sess.email
       }])
     }
     
@@ -146,13 +141,11 @@ app.post("/logout", function(req, res) {
 
 
 app.post("/dashboardData", function(req, res) {
-    var query = { "email": sess };
+
+    var query = { "email": sess.email };
 
     DB.collection("user").find(query).toArray(function(err, result) {
         if (err) throw err;
-
-
- console.log(result);
         res.send(result);
 
     });
@@ -209,7 +202,7 @@ app.post('/send', function(req, res) {
     console.log(mailOptions);
     transporter.sendMail(mailOptions, function(error, response) {
         if (error) {
-            console.log(error);
+            
             res.end("error");
         } else {
           
@@ -236,6 +229,7 @@ app.get('/verify', function(req, res) {
             });
 
             rand1 = Math.floor((Math.random() * 1000) + 54);
+         
 
 
             ownerlink = "http://localhost:4200/customerReview?q="+ rand1;
@@ -255,15 +249,15 @@ app.get('/verify', function(req, res) {
 
 
 
-            res.end("<h1>Email:" + mailOptions.to + " is been Successfully verified.Link for Review of your site----><a href='#'>" + ownerlink + "</a></h1>");
+            res.end("<h2>Email:" + mailOptions.to + " is been Successfully verified.Link for Review of your site----><a href="+ ownerlink +">" + ownerlink + "</a></h2>");
             res.redirect('login');
             res.render('login');
         } else {
             
-            res.end("<h1>Link is Expired</h1>");
+            res.end("<h2>Link is Expired</h2>");
         }
     } else {
-        res.end("<h1>Invalid Request");
+        res.end("<h2>Invalid Request<h2>");
     }
 });
 
@@ -292,7 +286,7 @@ app.post('/fsend', function(req, res) {
                 // console.log(mailOptions);
             transporter.sendMail(mailOptions, function(error, response) {
                 if (error) {
-                    console.log(error);
+                    
                     res.end("error");
                 } else {
                     console.log("Message sent");
@@ -351,7 +345,7 @@ app.post("/rate", function(req, res) {
     DB.collection("starrate").find(query).toArray(function(err, result) {
         if (err) throw err;
 
-        console.log(result);
+       
         console.log("rttt"+result.length+"rttt");
 
         if (!result.length) {
@@ -429,6 +423,6 @@ app.post('/graph', function(req, res) {
 
 
 
-app.listen(8080, function() {
+app.listen(port, function() {
     console.log("server started");
 });
