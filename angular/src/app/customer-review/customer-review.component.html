@@ -1,0 +1,49 @@
+<header class="v-header container-fluid">
+    <div class="fullscreen-video-wrap">
+       <video src="./assets/video/video1.mp4" autoplay="true" loop="true"></video>
+    </div>
+    <div class="header-overlay">
+        <h1>Instant Ratings for the Website</h1>
+      <div class="header-content review">
+        <form class="form-container" class="form-group">
+
+            <div class="input-group mb-3 justify-content-center">
+                      <label style="font-size: 2.3em;margin-bottom:0;font-weight: 500;color:rgb(250, 245, 245)">{{business}}</label>
+                 
+            </div>
+        
+            <div class="input-group mb-3">
+             <!-- <select class="custom-select" name="star" [(ngModel)]="star">
+               <option selected>Choose...</option>
+                <option value=5>5</option>
+                <option value=4>4</option>
+                <option value=3>3</option>
+                <option value=2>2</option>
+                <option value=1>1</option>        
+            </select> -->
+
+            <div>
+            <ngb-rating [(rate)]="selected" [formControl]="ctrl" max="5">
+                    <ng-template let-fill="fill" let-index="index">
+                            <span class="star" [class.filled]="fill === 100">&#9733;</span>
+                          </ng-template>
+            </ngb-rating>
+            </div>
+            <div class="form-text medium">
+                    <div *ngIf="ctrl.valid" class="text-success">Thanks!</div>
+                    <div *ngIf="ctrl.invalid" class="text-white">Please rate us</div>
+            </div>
+          
+    </div>
+
+         <button type="submit" class="btn btn-primary btn-block btn-large" (click)="rate()">Submit</button>
+
+        </form>
+      
+    </div>
+  </div>
+
+</header>
+
+
+
